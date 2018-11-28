@@ -3,6 +3,7 @@ package org.revo.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.revo.Config.Processor;
 import org.revo.Domain.Index;
+import org.revo.Domain.IndexImpl;
 import org.revo.Domain.Master;
 import org.revo.Domain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,9 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.messaging.support.MessageBuilder.withPayload;
 
@@ -47,11 +49,18 @@ public class Receiver {
                 .ifPresent(it -> {
                     processor.ToBento4_hls().send(MessageBuilder.withPayload(it).build());
                     processor.ToFfmpeg_png().send(MessageBuilder.withPayload(it).build());
-                    it.getImpls().stream().skip(1).filter(index -> index.getStatus() == Status.BINDING).forEach(index -> {
-                        it.setImpls(Collections.singletonList(index));
+
+                    List<IndexImpl> collect = it.getImpls().stream().skip(1).filter(index -> index.getStatus() == Status.BINDING)
+                            .collect(Collectors.toList());
+
+                    for (int i = 0; i < collect.size(); i++) {
+                        it.setImpls(Collections.singletonList(collect.get(i)));
                         processor.ToFfmpeg_mp4().send(MessageBuilder.withPayload(it)
+//                                see config/src/main/resources/config/ffmpeg.yml#21
+                                .setHeader("priority", 20 - i)
                                 .build());
-                    });
+
+                    }
                 });
 //        processor.ToFeedBack_push().send(withPayload(new Stater(master.getPayload(), Queue.TUBE_INFO, State.UNDER_GOING)).build());
     }
