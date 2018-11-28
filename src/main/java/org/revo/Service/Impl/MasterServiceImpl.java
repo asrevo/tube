@@ -78,7 +78,7 @@ public class MasterServiceImpl implements MasterService {
     public Master save(Master master) {
         master.setSecret(generateKey());
         master = masterRepository.save(master);
-        master.setImage(signedUrlService.getUrl(master.getId(), "thumb"));
+        master.setImage(signedUrlService.getUrl(master.getId()+".png", "thumb"));
         return masterRepository.save(master);
     }
 
