@@ -5,7 +5,6 @@ import org.bson.types.ObjectId;
 import org.revo.Domain.*;
 import org.revo.Repository.MasterRepository;
 import org.revo.Service.MasterService;
-import org.revo.Service.SignedUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -19,8 +18,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static org.revo.Domain.IndexImpl.list;
-import static org.revo.Domain.Resolution.getLess;
 import static org.revo.Util.Util.generateKey;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -32,22 +29,17 @@ public class MasterServiceImpl implements MasterService {
     private MasterRepository masterRepository;
     @Autowired
     private MongoOperations mongoOperations;
-    @Autowired
-    private SignedUrlService signedUrlService;
 
     @Override
-    public Optional<Master> update(Master master) {
+    public Master saveInfo(Master master) {
         return masterRepository.findById(master.getId()).map(it -> {
-            it.setStream("#EXTM3U\n#EXT-X-VERSION:4\n# Media Playlists\n");
+            it.setStream(master.getStream());
             it.setTime(master.getTime());
             it.setResolution(master.getResolution());
+            it.setFormat(master.getFormat());
+            it.setImpls(master.getImpls());
             return it;
-        }).map(it -> {
-            List<IndexImpl> list = list(getLess(it.getResolution()));
-            list.add(0, new IndexImpl(it.getId(), it.getResolution(), Status.BINDING));
-            it.setImpls(list);
-            return masterRepository.save(it);
-        });
+        }).map(it -> masterRepository.save(it)).orElse(null);
     }
 
     @Override
@@ -77,8 +69,6 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public Master save(Master master) {
         master.setSecret(generateKey());
-        master = masterRepository.save(master);
-        master.setImage(signedUrlService.getUrl(master.getId()+".png", "thumb"));
         return masterRepository.save(master);
     }
 

@@ -1,51 +1,47 @@
 package org.revo.Service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.revo.Config.Processor;
 import org.revo.Domain.Index;
-import org.revo.Domain.IndexImpl;
 import org.revo.Domain.Master;
-import org.revo.Domain.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.messaging.support.MessageBuilder.withPayload;
+import org.springframework.messaging.handler.annotation.SendTo;
 
 /**
  * Created by ashraf on 23/04/17.
  */
 @MessageEndpoint
-@Slf4j
 public class Receiver {
-    @Autowired
-    private Processor processor;
     @Autowired
     private MasterService masterService;
     @Autowired
     private IndexService indexService;
 
-    @StreamListener(value = Processor.ToTube_hls)
+    @StreamListener(value = Processor.tube_hls)
     public void hls(Message<Index> index) {
-        log.info("recived " + index.getPayload().getId());
+        masterService.append(indexService.save(index.getPayload()));
+    }
+
+    @StreamListener(value = Processor.tube_info)
+//    @SendTo(value = Processor.indexing_queue)
+    public Master info(Message<Master> master) {
+        return masterService.saveInfo(master.getPayload());
+    }
+
+    @StreamListener(value = Processor.tube_store)
+    @SendTo(value = Processor.ffmpeg_queue)
+    public Master store(Message<Master> master) {
+        return masterService.save(master.getPayload());
+    }
+}
 
 //        Optional<Master> master = masterService.findOne(index.getPayload().getMaster());
 //        processor.ToFeedBack_push().send(withPayload(new Stater(master.get(), Queue.TUBE_HLS, State.ON_GOING)).build());
-        masterService.append(indexService.save(index.getPayload()));
 //        processor.ToFeedBack_push().send(withPayload(new Stater(master.get(), Queue.TUBE_HLS, State.UNDER_GOING)).build());
-    }
-
-    @StreamListener(value = Processor.ToTube_info)
-    public void info(Message<Master> master) {
-        log.info("recived " + master.getPayload().getId());
 //        processor.ToFeedBack_push().send(withPayload(new Stater(master.getPayload(), Queue.TUBE_INFO, State.ON_GOING)).build());
-        masterService.update(master.getPayload())
+/*
                 .ifPresent(it -> {
                     processor.ToBento4_hls().send(MessageBuilder.withPayload(it).build());
                     processor.ToFfmpeg_png().send(MessageBuilder.withPayload(it).build());
@@ -62,16 +58,9 @@ public class Receiver {
 
                     }
                 });
+*/
 //        processor.ToFeedBack_push().send(withPayload(new Stater(master.getPayload(), Queue.TUBE_INFO, State.UNDER_GOING)).build());
-    }
-
-    @StreamListener(value = Processor.ToTube_store)
-    public void store(Message<Master> master) {
-        log.info("recived " + master.getPayload().getId());
-        Master saved = masterService.save(master.getPayload());
 //should group based to master.getPayload().getFile()
 //        processor.ToFeedBack_push().send(withPayload(new Stater(saved, Queue.BENTO4_INFO, State.ON_GOING)).build());
-        processor.ToBento4_info().send(withPayload(saved).build());
+//        processor.ToBento4_info().send(withPayload(saved).build());
 //        processor.ToFeedBack_push().send(withPayload(new Stater(saved, Queue.BENTO4_INFO, State.UNDER_GOING)).build());
-    }
-}

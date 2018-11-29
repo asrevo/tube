@@ -49,8 +49,8 @@ public class MediaGroupServiceImpl implements MediaGroupService {
     public void addMediaToMediaGroup(MediaGroup mediaGroup, String media) {
         Query query = new Query(Criteria.where("id").is(new ObjectId(mediaGroup.getId()))
                 .and("userId").is(mediaGroup.getUserId()));
-        Update update = new Update().addToSet("media", media);
-        mongoOperations.updateFirst(query, update, MediaGroup.class);
+        Update saveInfo = new Update().addToSet("media", media);
+        mongoOperations.updateFirst(query, saveInfo, MediaGroup.class);
     }
 
     @Override

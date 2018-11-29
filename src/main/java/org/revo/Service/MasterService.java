@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MasterService {
-    Optional<Master> update(Master master);
+    Master saveInfo(Master master);
 
     void append(Index index);
 
