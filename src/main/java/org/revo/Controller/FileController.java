@@ -1,7 +1,7 @@
 package org.revo.Controller;
 
 import org.revo.Config.Processor;
-import org.revo.Domain.*;
+import org.revo.Domain.File;
 import org.revo.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
@@ -20,8 +20,7 @@ public class FileController {
 
     @PostMapping("save")
     public void save(@RequestBody File file) {
-        File saved = fileService.save(file);
-        processor.ToFile().send(MessageBuilder.withPayload(saved).build());
+        processor.file_queue().send(MessageBuilder.withPayload(fileService.save(file)).build());
 //        processor.ToFeedBack_push().send(MessageBuilder.withPayload(new Stater(((Base) saved), Queue.FILE, State.QUEUED)).build());
     }
 }
