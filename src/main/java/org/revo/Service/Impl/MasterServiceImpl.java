@@ -37,6 +37,7 @@ public class MasterServiceImpl implements MasterService {
             it.setTime(master.getTime());
             it.setResolution(master.getResolution());
             it.setFormat(master.getFormat());
+            it.setImage(master.getImage());
             it.setImpls(master.getImpls());
             return it;
         }).map(it -> masterRepository.save(it)).orElse(null);
