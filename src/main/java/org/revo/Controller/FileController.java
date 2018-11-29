@@ -1,5 +1,6 @@
 package org.revo.Controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.revo.Config.Processor;
 import org.revo.Domain.File;
 import org.revo.Service.FileService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/file")
+@Slf4j
 public class FileController {
     @Autowired
     public FileService fileService;
@@ -20,7 +22,8 @@ public class FileController {
 
     @PostMapping("save")
     public void save(@RequestBody File file) {
-        processor.file_queue().send(MessageBuilder.withPayload(fileService.save(file)).build());
-//        processor.ToFeedBack_push().send(MessageBuilder.withPayload(new Stater(((Base) saved), Queue.FILE, State.QUEUED)).build());
+        File save = fileService.save(file);
+        log.info("send file_queue " + file.getId());
+        processor.file_queue().send(MessageBuilder.withPayload(save).build());
     }
 }
