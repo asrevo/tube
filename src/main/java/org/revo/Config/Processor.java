@@ -19,7 +19,7 @@ public interface Processor {
     String tube_store = "tube_store";
 
     @Input("tube_store")
-    MessageChannel tube_store();
+    SubscribableChannel tube_store();
 
 
     String indexing_queue = "indexing_queue";
