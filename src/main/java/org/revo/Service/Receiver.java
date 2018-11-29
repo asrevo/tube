@@ -39,6 +39,8 @@ public class Receiver {
     @SendTo(value = Processor.ffmpeg_queue)
     public Master store(Message<Master> master) {
         log.info("receive tube_store " + master.getPayload().getId());
-        return masterService.save(master.getPayload());
+        Master save = masterService.save(master.getPayload());
+        log.info("send ffmpeg_queue " + save.getId());
+        return save;
     }
 }
