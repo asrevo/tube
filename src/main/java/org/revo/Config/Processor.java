@@ -39,8 +39,8 @@ public interface Processor {
     @Output("file_queue")
     MessageChannel file_queue();
 
-    String feedBack_push = "feedBack_push";
+    String feedback_queue = "feedback_queue";
 
-    @Output("feedBack_push")
-    MessageChannel feedBack_push();
+    @Output("feedback_queue")
+    MessageChannel feedback_queue();
 }
