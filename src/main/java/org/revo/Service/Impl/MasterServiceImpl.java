@@ -96,6 +96,7 @@ public class MasterServiceImpl implements MasterService {
 //                        .first("stream").as("stream")
 //                        .first("secret").as("secret")
                         .first("file").as("file")
+                        .first("format").as("format")
                         .first("time").as("time")
                         .first("resolution").as("resolution")
                 , sort(DESC, "id")
