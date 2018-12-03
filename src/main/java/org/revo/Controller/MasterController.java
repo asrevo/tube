@@ -50,7 +50,7 @@ public class MasterController {
         return masterService.findAll(Status.SUCCESS, 1000, null, ids);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("one/{id}")
     public Optional<Master> findOne(@PathVariable("id") String id) {
         return masterService.findOne(id);
     }
