@@ -24,7 +24,7 @@ public class MasterController {
     private IndexService indexService;
     private final String masterURL = "{master}.m3u8";
     private final String indexUrl = masterURL + "/{index}.m3u8";
-    private final String keyUrl = indexUrl + "/{master}.key";
+    private final String keyUrl = masterURL + "/{master}.key";
 
     @GetMapping("{size}/{id}")
     public Iterable<Master> findAllPagining(@PathVariable int size, @PathVariable String id) {
