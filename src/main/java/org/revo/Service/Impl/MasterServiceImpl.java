@@ -63,7 +63,7 @@ public class MasterServiceImpl implements MasterService {
         attributes.put("BANDWIDTH", index.getBandwidth());
         attributes.put("CODECS", "\"" + index.getCodecs() + "\"");
         attributes.put("RESOLUTION", index.getResolution().toLowerCase());
-        unparsedTag.setURI(Paths.get("/", index.getId() + ".m3u8").toString());
+        unparsedTag.setURI(Paths.get(index.getMaster()+".m3u8/", index.getId() + ".m3u8").toString());
         return "#" + unparsedTag.getTagName() + ":" + attributes.entrySet().stream().map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.joining(",")) + "\n" + unparsedTag.getURI() + "\n";
     }
 
