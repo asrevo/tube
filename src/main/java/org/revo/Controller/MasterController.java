@@ -57,7 +57,7 @@ public class MasterController {
 
     @GetMapping(masterURL)
     public void findOneMaster(@PathVariable("master") String master, HttpServletResponse response) throws IOException {
-        response.getWriter().print(masterService.findOne(master).get().getStream());
+        response.getWriter().print(masterService.getStream(master));
         response.setContentType("application/x-mpegURL");
         response.setHeader("Content-disposition", "attachment; filename=" + master + ".m3u8");
     }

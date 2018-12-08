@@ -37,6 +37,11 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
+    public List<Index> findByMaster(String master) {
+        return indexRepository.findByMaster(master);
+    }
+
+    @Override
     public String findOneParsed(String master, String index) {
         return findOne(index).map(it -> {
             List<UnparsedTag> tags = PlaylistFactory.parsePlaylist(PlaylistVersion.TWELVE, it.getStream()).getTags();

@@ -11,7 +11,6 @@ import java.util.List;
 @Document
 public class Master extends Base {
     private String image;
-    private String stream;
     private String secret;
     private String file;
     private List<IndexImpl> impls;

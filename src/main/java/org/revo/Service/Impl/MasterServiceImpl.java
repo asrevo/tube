@@ -4,6 +4,7 @@ import com.comcast.viper.hlsparserj.tags.UnparsedTag;
 import org.bson.types.ObjectId;
 import org.revo.Domain.*;
 import org.revo.Repository.MasterRepository;
+import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -29,11 +30,12 @@ public class MasterServiceImpl implements MasterService {
     private MasterRepository masterRepository;
     @Autowired
     private MongoOperations mongoOperations;
+    @Autowired
+    private IndexService indexService;
 
     @Override
     public Master saveInfo(Master master) {
         return masterRepository.findById(master.getId()).map(it -> {
-            it.setStream(master.getStream());
             it.setTime(master.getTime());
             it.setResolution(master.getResolution());
             it.setImage(master.getImage());
@@ -49,7 +51,6 @@ public class MasterServiceImpl implements MasterService {
                     List<IndexImpl> indexList = it.getImpls().stream().filter(i -> i.getIndex() != null && !i.getIndex().equals(index.getId())).collect(toList());
                     indexList.add(new IndexImpl(index.getId(), index.getResolution(), Status.SUCCESS, index.getExecution()));
                     it.setImpls(indexList);
-                    it.setStream(it.getStream() + getParsedTag(index));
                     return masterRepository.save(it);
                 });
     }
@@ -75,6 +76,11 @@ public class MasterServiceImpl implements MasterService {
     @Override
     public Optional<Master> findOne(String master) {
         return masterRepository.findById(master);
+    }
+
+    @Override
+    public String getStream(String master) {
+        return "#EXTM3U\n#EXT-X-VERSION:4\n# Media Playlists\n" + indexService.findByMaster(master).stream().map(MasterServiceImpl::getParsedTag).collect(Collectors.joining("\n"));
     }
 
     @Override
