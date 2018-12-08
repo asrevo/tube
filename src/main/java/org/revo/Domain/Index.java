@@ -17,4 +17,5 @@ public class Index {
     private String bandwidth;
     private String codecs;
     private String resolution;
+    private long execution;
 }

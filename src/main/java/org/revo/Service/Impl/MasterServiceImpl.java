@@ -47,7 +47,7 @@ public class MasterServiceImpl implements MasterService {
         findOne(index.getMaster())
                 .map(it -> {
                     List<IndexImpl> indexList = it.getImpls().stream().filter(i -> i.getIndex() != null && !i.getIndex().equals(index.getId())).collect(toList());
-                    indexList.add(new IndexImpl(index.getId(), index.getResolution(), Status.SUCCESS));
+                    indexList.add(new IndexImpl(index.getId(), index.getResolution(), Status.SUCCESS, index.getExecution()));
                     it.setImpls(indexList);
                     it.setStream(it.getStream() + getParsedTag(index));
                     return masterRepository.save(it);
@@ -62,7 +62,7 @@ public class MasterServiceImpl implements MasterService {
         attributes.put("BANDWIDTH", index.getBandwidth());
         attributes.put("CODECS", "\"" + index.getCodecs() + "\"");
         attributes.put("RESOLUTION", index.getResolution().toLowerCase());
-        unparsedTag.setURI(Paths.get(index.getMaster()+".m3u8/", index.getId() + ".m3u8").toString());
+        unparsedTag.setURI(Paths.get(index.getMaster() + ".m3u8/", index.getId() + ".m3u8").toString());
         return "#" + unparsedTag.getTagName() + ":" + attributes.entrySet().stream().map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.joining(",")) + "\n" + unparsedTag.getURI() + "\n";
     }
 
