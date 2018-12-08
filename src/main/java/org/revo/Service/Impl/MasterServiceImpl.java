@@ -80,7 +80,7 @@ public class MasterServiceImpl implements MasterService {
 
     @Override
     public String getStream(String master) {
-        return "#EXTM3U\n#EXT-X-VERSION:4\n# Media Playlists\n" + indexService.findByMaster(master).stream().map(MasterServiceImpl::getParsedTag).collect(Collectors.joining("\n"));
+        return "#EXTM3U\n#EXT-X-VERSION:4\n# Media Playlists\n" + indexService.findByMaster(master).stream().map(MasterServiceImpl::getParsedTag).collect(Collectors.joining());
     }
 
     @Override
