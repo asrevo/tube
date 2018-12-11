@@ -6,6 +6,7 @@ import org.revo.Domain.File;
 import org.revo.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +23,16 @@ public class FileController {
 
     @PostMapping("save")
     public void save(@RequestBody File file) {
-        File save = fileService.save(file);
-        log.info("send file_queue " + file.getId());
-        processor.file_queue().send(MessageBuilder.withPayload(save).build());
+        Message<File> fileMessage = MessageBuilder.withPayload(fileService.save(file)).build();
+        if (fileMessage.getPayload().getUrl().startsWith("http")) {
+            log.info("send file_queue " + fileMessage.getPayload().getId());
+            processor.file_queue().send(fileMessage);
+
+        } else if (fileMessage.getPayload().getUrl().startsWith("magnet")) {
+            log.info("send torrent_queue " + fileMessage.getPayload().getId());
+            processor.torrent_queue().send(fileMessage);
+        } else {
+            log.info("send to unknown");
+        }
     }
 }
