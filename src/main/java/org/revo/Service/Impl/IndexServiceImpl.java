@@ -45,7 +45,7 @@ public class IndexServiceImpl implements IndexService {
     public String findOneParsed(String master, String index) {
         return findOne(index).map(it -> {
             List<UnparsedTag> tags = PlaylistFactory.parsePlaylist(PlaylistVersion.TWELVE, it.getStream()).getTags();
-            return Util.TOString(tags, s -> signedUrlService.generate(env.getBuckets().get("ts"), get("hls", master, index,"media-1", s).toString()));
+            return Util.TOString(tags, s -> signedUrlService.generate(env.getBuckets().get("ts"), get("hls", master, index, s).toString()));
         }).orElse("");
     }
 
