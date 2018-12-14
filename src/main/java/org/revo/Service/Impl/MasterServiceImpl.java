@@ -59,10 +59,14 @@ public class MasterServiceImpl implements MasterService {
         UnparsedTag unparsedTag = new UnparsedTag();
         unparsedTag.setTagName("EXT-X-STREAM-INF");
         HashMap<String, String> attributes = new HashMap<>();
-        attributes.put("AVERAGE-BANDWIDTH", index.getAverage_bandwidth());
-        attributes.put("BANDWIDTH", index.getBandwidth());
-        attributes.put("CODECS", "\"" + index.getCodecs() + "\"");
-        attributes.put("RESOLUTION", index.getResolution().toLowerCase());
+        if (index.getAverage_bandwidth() != null && !index.getAverage_bandwidth().trim().isEmpty())
+            attributes.put("AVERAGE-BANDWIDTH", index.getAverage_bandwidth());
+        if (index.getBandwidth() != null && !index.getBandwidth().trim().isEmpty())
+            attributes.put("BANDWIDTH", index.getBandwidth());
+        if (index.getCodecs() != null && !index.getCodecs().trim().isEmpty())
+            attributes.put("CODECS", "\"" + index.getCodecs() + "\"");
+        if (index.getResolution() != null && !index.getResolution().trim().isEmpty())
+            attributes.put("RESOLUTION", index.getResolution().toLowerCase());
         unparsedTag.setURI(Paths.get(index.getMaster() + ".m3u8/", index.getId() + ".m3u8").toString());
         return "#" + unparsedTag.getTagName() + ":" + attributes.entrySet().stream().map(it -> it.getKey() + "=" + it.getValue()).collect(Collectors.joining(",")) + "\n" + unparsedTag.getURI() + "\n";
     }
