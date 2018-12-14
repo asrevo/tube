@@ -71,7 +71,7 @@ public class MasterController {
 
     @GetMapping(keyUrl)
     public void findOneKey(@PathVariable("master") String master, HttpServletResponse response) throws IOException {
-        response.getOutputStream().write(Util.secret(masterService.findOne(master).map(Master::getSecret).orElse("")));
+        response.getOutputStream().print(masterService.findOne(master).map(Master::getSecret).orElse(""));
         response.setContentType("application/pgp-keys");
         response.setHeader("Content-disposition", "attachment; filename=" + master + ".key");
     }
