@@ -93,7 +93,7 @@ public class MasterServiceImpl implements MasterService {
         if (masterIds.getIds().size() == 0)
             lt.and("id").lt(Optional.ofNullable(id).map(ObjectId::new).orElse(new ObjectId()));
         if (userIds.getIds().size() > 0) lt.and("userId").in(userIds.getIds());
-        if (masterIds.getIds().size() > 0) lt.and("id").in(userIds.getIds());
+        if (masterIds.getIds().size() > 0) lt.and("id").in(masterIds.getIds());
         TypedAggregation<Master> agg = newAggregation(Master.class,
                 unwind("impls"),
                 match(lt),
