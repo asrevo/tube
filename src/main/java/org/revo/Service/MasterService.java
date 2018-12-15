@@ -19,5 +19,5 @@ public interface MasterService {
 
     String getStream(String master);
 
-    List<Master> findAll(Status status, int size, String id, Ids ids);
+    List<Master> findAll(Status status, int size, String id, Ids userIds, Ids masterIds);
 }

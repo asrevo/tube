@@ -5,7 +5,6 @@ import org.revo.Domain.Master;
 import org.revo.Domain.Status;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
-import org.revo.Util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,25 +28,25 @@ public class MasterController {
     @GetMapping("{size}/{id}")
     public Iterable<Master> findAllPagining(@PathVariable int size, @PathVariable String id) {
         if (id.equals("0")) id = null;
-        return masterService.findAll(Status.SUCCESS, size, id, new Ids());
+        return masterService.findAll(Status.SUCCESS, size, id, new Ids(), new Ids());
     }
 
     @PostMapping("{size}/{id}")
     public Iterable<Master> findAllPaginingWithnUsers(@PathVariable int size, @PathVariable String id, @RequestBody Ids ids) {
         if (id.equals("0")) id = null;
-        return masterService.findAll(Status.SUCCESS, size, id, ids);
+        return masterService.findAll(Status.SUCCESS, size, id, ids, new Ids());
     }
 
     @PostMapping
     public Iterable<Master> findAllByIds(@RequestBody Ids ids) {
-        return masterService.findAll(Status.SUCCESS, 1000, null, ids);
+        return masterService.findAll(Status.SUCCESS, 1000, null, new Ids(), ids);
     }
 
     @GetMapping("user/{id}")
     public List<Master> findAllByUser(@PathVariable("id") String id) {
         Ids ids = new Ids();
         ids.setIds(Arrays.asList(id));
-        return masterService.findAll(Status.SUCCESS, 1000, null, ids);
+        return masterService.findAll(Status.SUCCESS, 1000, null, ids, new Ids());
     }
 
     @GetMapping("one/{id}")

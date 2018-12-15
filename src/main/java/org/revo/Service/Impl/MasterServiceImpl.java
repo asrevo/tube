@@ -88,10 +88,11 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
-    public List<Master> findAll(Status status, int size, String id, Ids ids) {
+    public List<Master> findAll(Status status, int size, String id, Ids userIds, Ids masterIds) {
         Criteria lt = where("impls.status").is(status.toString());
         lt.and("id").lt(Optional.ofNullable(id).map(ObjectId::new).orElse(new ObjectId()));
-        if (ids.getIds().size() > 0) lt.and("userId").in(ids.getIds());
+        if (userIds.getIds().size() > 0) lt.and("userId").in(userIds.getIds());
+        if (masterIds.getIds().size() > 0) lt.and("id").in(userIds.getIds());
         TypedAggregation<Master> agg = newAggregation(Master.class,
                 unwind("impls"),
                 match(lt),
