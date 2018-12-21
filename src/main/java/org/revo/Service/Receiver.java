@@ -28,11 +28,10 @@ public class Receiver {
     }
 
     @StreamListener(value = Processor.tube_info)
-//    @SendTo(value = Processor.indexing_queue)
-    public /*Master*/void info(Message<Master> master) {
+    @SendTo(value = Processor.indexing_queue)
+    public Master info(Message<Master> master) {
         log.info("receive tube_info " + master.getPayload().getId());
-        masterService.saveInfo(master.getPayload());
-        return;
+        return masterService.saveInfo(master.getPayload());
     }
 
     @StreamListener(value = Processor.tube_store)
