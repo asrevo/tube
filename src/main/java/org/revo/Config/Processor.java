@@ -43,9 +43,4 @@ public interface Processor {
 
     @Output("torrent_queue")
     MessageChannel torrent_queue();
-
-    String feedback_queue = "feedback_queue";
-
-    @Output("feedback_queue")
-    MessageChannel feedback_queue();
 }
