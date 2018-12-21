@@ -28,7 +28,7 @@ public class Receiver {
     }
 
     @StreamListener(value = Processor.tube_info)
-    @SendTo(value = Processor.indexing_queue)
+    @SendTo(value = Processor.feedback_index)
     public Master info(Message<Master> master) {
         log.info("receive tube_info " + master.getPayload().getId());
         return masterService.saveInfo(master.getPayload());

@@ -22,10 +22,10 @@ public interface Processor {
     SubscribableChannel tube_store();
 
 
-    String indexing_queue = "indexing_queue";
+    String feedback_index = "feedback_index";
 
-    @Output("indexing_queue")
-    MessageChannel indexing_queue();
+    @Output("feedback_index")
+    MessageChannel feedback_index();
 
 
     String ffmpeg_queue = "ffmpeg_queue";
