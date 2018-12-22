@@ -5,6 +5,7 @@ import org.revo.Config.Processor;
 import org.revo.Domain.File;
 import org.revo.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +21,13 @@ public class FileController {
     public FileService fileService;
     @Autowired
     public Processor processor;
+    @Autowired
+    public QueueMessagingTemplate template;
 
     @PostMapping("save")
     public void save(@RequestBody File file) {
         Message<File> fileMessage = MessageBuilder.withPayload(fileService.save(file)).build();
+        template.convertAndSend("lambda_file_queue", fileMessage);
         if (fileMessage.getPayload().getUrl().startsWith("http")) {
             log.info("send file_queue " + fileMessage.getPayload().getId());
             processor.file_queue().send(fileMessage);

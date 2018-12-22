@@ -2,9 +2,11 @@ package org.revo.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.revo.Config.Processor;
+import org.revo.Domain.File;
 import org.revo.Domain.Index;
 import org.revo.Domain.Master;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.messaging.Message;
@@ -41,5 +43,10 @@ public class Receiver {
         Master save = masterService.save(master.getPayload());
         log.info("send ffmpeg_queue " + save.getId());
         return save;
+    }
+
+    @SqsListener("tube_file_queue")
+    public void queueListener(Message<File> fileMessage) {
+        log.info("receive tube_file_queue " + fileMessage.getPayload().getId());
     }
 }
