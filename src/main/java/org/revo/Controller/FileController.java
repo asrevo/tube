@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("api/file")
 @Slf4j
@@ -25,7 +27,12 @@ public class FileController {
     public QueueMessagingTemplate template;
 
     @PostMapping("save")
-    public void save(@RequestBody File file) {
+    public void save(@RequestBody File file, HttpServletRequest request) {
+
+        String remoteAddr = request.getRemoteAddr();
+        log.info("remot " + remoteAddr);
+
+
         Message<File> fileMessage = MessageBuilder.withPayload(fileService.save(file)).build();
         template.convertAndSend("lambda_file_queue", fileMessage);
         if (fileMessage.getPayload().getUrl().startsWith("http")) {
