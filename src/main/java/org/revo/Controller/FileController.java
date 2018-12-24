@@ -28,11 +28,7 @@ public class FileController {
 
     @PostMapping("save")
     public void save(@RequestBody File file, HttpServletRequest request) {
-
-        String remoteAddr = request.getHeader("X-FORWARDED-FOR");
-        log.info("remot " + remoteAddr);
-
-
+        file.setIp(request.getHeader("X-FORWARDED-FOR"));
         Message<File> fileMessage = MessageBuilder.withPayload(fileService.save(file)).build();
         template.convertAndSend("lambda_file_queue", fileMessage);
         if (fileMessage.getPayload().getUrl().startsWith("http")) {

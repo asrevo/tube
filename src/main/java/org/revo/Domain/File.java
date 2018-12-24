@@ -9,4 +9,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class File extends Base {
     private String url;
+    private String ip;
 }
