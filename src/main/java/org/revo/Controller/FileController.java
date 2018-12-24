@@ -29,7 +29,7 @@ public class FileController {
     @PostMapping("save")
     public void save(@RequestBody File file, HttpServletRequest request) {
 
-        String remoteAddr = request.getRemoteAddr();
+        String remoteAddr = request.getHeader("X-FORWARDED-FOR");
         log.info("remot " + remoteAddr);
 
 
