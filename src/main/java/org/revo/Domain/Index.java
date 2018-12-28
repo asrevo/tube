@@ -15,7 +15,6 @@ public class Index {
     @Id
     private String id;
     private String master;
-    private String stream;
     private List<UnparsedTag> tags;
     private String average_bandwidth;
     private String bandwidth;

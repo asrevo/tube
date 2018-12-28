@@ -5,7 +5,6 @@ import org.revo.Domain.Index;
 import org.revo.Repository.IndexRepository;
 import org.revo.Service.IndexService;
 import org.revo.Service.SignedUrlService;
-import org.revo.Util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
