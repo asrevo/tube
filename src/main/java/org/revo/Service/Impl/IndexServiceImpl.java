@@ -1,8 +1,5 @@
 package org.revo.Service.Impl;
 
-import com.comcast.viper.hlsparserj.PlaylistFactory;
-import com.comcast.viper.hlsparserj.PlaylistVersion;
-import com.comcast.viper.hlsparserj.tags.UnparsedTag;
 import org.revo.Config.Env;
 import org.revo.Domain.Index;
 import org.revo.Repository.IndexRepository;
@@ -16,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.nio.file.Paths.get;
+import static org.revo.Util.Util.TOString;
 
 @Service
 public class IndexServiceImpl implements IndexService {
@@ -43,10 +41,7 @@ public class IndexServiceImpl implements IndexService {
 
     @Override
     public String findOneParsed(String master, String index) {
-        return findOne(index).map(it -> {
-            List<UnparsedTag> tags = PlaylistFactory.parsePlaylist(PlaylistVersion.TWELVE, it.getStream()).getTags();
-            return Util.TOString(tags, s -> signedUrlService.generate(env.getBuckets().get("ts"), get("hls", master, index, s).toString()));
-        }).orElse("");
+        return findOne(index).map(it -> TOString(it.getTags(), s -> signedUrlService.generate(env.getBuckets().get("ts"), get("hls", master, index, s).toString()))).orElse("");
     }
 
 }
