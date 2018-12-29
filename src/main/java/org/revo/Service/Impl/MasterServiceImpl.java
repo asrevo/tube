@@ -40,6 +40,7 @@ public class MasterServiceImpl implements MasterService {
             it.setResolution(master.getResolution());
             it.setImage(master.getImage());
             it.setImpls(master.getImpls());
+            it.setSplits(master.getSplits());
             return it;
         }).map(it -> masterRepository.save(it)).orElse(null);
     }
