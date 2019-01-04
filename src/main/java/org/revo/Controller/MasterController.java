@@ -77,7 +77,7 @@ public class MasterController {
     @GetMapping(keyUrl)
     public ResponseEntity<InputStreamResource> findOneKey(@PathVariable("master") String master) {
         return ResponseEntity.ok()
-                .header("Content-Type", "application/x-mpegURL")
+                .header("Content-Type", "application/pgp-keys")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
                 .body(new InputStreamResource(IOUtils.toInputStream(masterService.findOne(master).map(Master::getSecret).orElse(""))));
     }
