@@ -6,13 +6,17 @@ import org.revo.Domain.Status;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 
-//import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+//import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("api")
@@ -54,26 +58,27 @@ public class MasterController {
         return masterService.findOne(id);
     }
 
-/*
     @GetMapping(masterURL)
-    public void findOneMaster(@PathVariable("master") String master, HttpServletResponse response) throws IOException {
-        response.getWriter().print(masterService.getStream(master));
-        response.setContentType("application/x-mpegURL");
-        response.setHeader("Content-disposition", "attachment; filename=" + master + ".m3u8");
+    public ResponseEntity<String> findOneMaster(@PathVariable("master") String master, ServerHttpResponse response) throws IOException {
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/x-mpegURL")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
+                .body(masterService.getStream(master));
     }
 
     @GetMapping(indexUrl)
-    public void findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index, HttpServletResponse response) throws IOException {
-        response.getWriter().print(indexService.findOneParsed(master, index));
-        response.setContentType("application/x-mpegURL");
-        response.setHeader("Content-disposition", "attachment; filename=" + master + ".m3u8");
+    public ResponseEntity<String> findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index) throws IOException {
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/x-mpegURL")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
+                .body(indexService.findOneParsed(master, index));
     }
 
     @GetMapping(keyUrl)
-    public void findOneKey(@PathVariable("master") String master, HttpServletResponse response) throws IOException {
-        response.getOutputStream().print(masterService.findOne(master).map(Master::getSecret).orElse(""));
-        response.setContentType("application/pgp-keys");
-        response.setHeader("Content-disposition", "attachment; filename=" + master + ".key");
+    public ResponseEntity<String> findOneKey(@PathVariable("master") String master) throws IOException {
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/x-mpegURL")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
+                .body(masterService.findOne(master).map(Master::getSecret).orElse(""));
     }
-*/
 }
