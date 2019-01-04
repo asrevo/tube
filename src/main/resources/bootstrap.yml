@@ -14,7 +14,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:9999/auth/.well-known/jwks.json
+          jwk-set-uri: http://auth-responsible-oribi.cfapps.io/auth/.well-known/jwks.json
   application:
     name: tube
   cloud:
