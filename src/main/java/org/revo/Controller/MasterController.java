@@ -8,10 +8,8 @@ import org.revo.Service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +25,7 @@ public class MasterController {
     private IndexService indexService;
     private final String masterURL = "{master}.m3u8";
     private final String indexUrl = masterURL + "/{index}.m3u8";
-    private final String keyUrl = masterURL + "/{master}.key";
+    private final String keyUrl = masterURL + "/{master_id}.key";
 
     @GetMapping("{size}/{id}")
     public Iterable<Master> findAllPagining(@PathVariable int size, @PathVariable String id) {
@@ -59,7 +57,7 @@ public class MasterController {
     }
 
     @GetMapping(masterURL)
-    public ResponseEntity<String> findOneMaster(@PathVariable("master") String master, ServerHttpResponse response) throws IOException {
+    public ResponseEntity<String> findOneMaster(@PathVariable("master") String master) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
@@ -67,7 +65,7 @@ public class MasterController {
     }
 
     @GetMapping(indexUrl)
-    public ResponseEntity<String> findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index) throws IOException {
+    public ResponseEntity<String> findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
@@ -75,7 +73,7 @@ public class MasterController {
     }
 
     @GetMapping(keyUrl)
-    public ResponseEntity<String> findOneKey(@PathVariable("master") String master) throws IOException {
+    public ResponseEntity<String> findOneKey(@PathVariable("master") String master) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
