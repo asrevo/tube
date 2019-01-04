@@ -10,6 +10,11 @@ org:
 server:
   port: 8081
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9999/auth/.well-known/jwks.json
   application:
     name: tube
   cloud:

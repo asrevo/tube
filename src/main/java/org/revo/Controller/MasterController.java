@@ -8,7 +8,7 @@ import org.revo.Service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
+//import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -54,6 +54,7 @@ public class MasterController {
         return masterService.findOne(id);
     }
 
+/*
     @GetMapping(masterURL)
     public void findOneMaster(@PathVariable("master") String master, HttpServletResponse response) throws IOException {
         response.getWriter().print(masterService.getStream(master));
@@ -74,4 +75,5 @@ public class MasterController {
         response.setContentType("application/pgp-keys");
         response.setHeader("Content-disposition", "attachment; filename=" + master + ".key");
     }
+*/
 }

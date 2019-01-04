@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("api/file")
@@ -26,6 +26,7 @@ public class FileController {
     @Autowired
     public QueueMessagingTemplate template;
 
+/*
     @PostMapping("save")
     public void save(@RequestBody File file, HttpServletRequest request) {
         file.setIp(request.getHeader("X-FORWARDED-FOR"));
@@ -42,4 +43,5 @@ public class FileController {
             log.info("send to unknown");
         }
     }
+*/
 }
