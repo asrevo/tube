@@ -1,11 +1,13 @@
 package org.revo.Controller;
 
+import org.apache.commons.io.IOUtils;
 import org.revo.Domain.Ids;
 import org.revo.Domain.Master;
 import org.revo.Domain.Status;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,26 +59,26 @@ public class MasterController {
     }
 
     @GetMapping(masterURL)
-    public ResponseEntity<String> findOneMaster(@PathVariable("master") String master) {
+    public ResponseEntity<InputStreamResource> findOneMaster(@PathVariable("master") String master) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
-                .body(masterService.getStream(master));
+                .body(new InputStreamResource(IOUtils.toInputStream(masterService.getStream(master))));
     }
 
     @GetMapping(indexUrl)
-    public ResponseEntity<String> findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index) {
+    public ResponseEntity<InputStreamResource> findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
-                .body(indexService.findOneParsed(master, index));
+                .body(new InputStreamResource(IOUtils.toInputStream(indexService.findOneParsed(master, index))));
     }
 
     @GetMapping(keyUrl)
-    public ResponseEntity<String> findOneKey(@PathVariable("master") String master) {
+    public ResponseEntity<InputStreamResource> findOneKey(@PathVariable("master") String master) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
-                .body(masterService.findOne(master).map(Master::getSecret).orElse(""));
+                .body(new InputStreamResource(IOUtils.toInputStream(masterService.findOne(master).map(Master::getSecret).orElse(""))));
     }
 }
