@@ -58,7 +58,6 @@ public class MasterController {
 
     @GetMapping("one/{id}")
     public Optional<Master> findOne(@PathVariable("id") String id) {
-        log.info("securityy sss s"+SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
         return masterService.findOne(id);
     }
 
