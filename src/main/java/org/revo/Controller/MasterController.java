@@ -1,5 +1,6 @@
 package org.revo.Controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.revo.Domain.Ids;
 import org.revo.Domain.Master;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -20,6 +22,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("api")
+@Slf4j
 public class MasterController {
     @Autowired
     private MasterService masterService;
@@ -55,6 +58,7 @@ public class MasterController {
 
     @GetMapping("one/{id}")
     public Optional<Master> findOne(@PathVariable("id") String id) {
+        log.info("securityy sss s"+SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
         return masterService.findOne(id);
     }
 
