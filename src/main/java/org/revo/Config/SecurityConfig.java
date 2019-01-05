@@ -1,6 +1,9 @@
 package org.revo.Config;
 
 import org.revo.Service.UserService;
+import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.actuate.info.InfoEndpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
@@ -17,6 +20,8 @@ public class SecurityConfig {
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
                 .authorizeExchange()
+                .pathMatchers("/actuator/**").permitAll()
+//                .matchers(EndpointRequest.to(HealthEndpoint.class, InfoEndpoint.class)).permitAll()
 //				.pathMatchers("/resource").hasAuthority("SCOPE_resource.read")
                 .pathMatchers(HttpMethod.GET, "/api/**").permitAll()
                 .pathMatchers(HttpMethod.POST, "/api/").permitAll()
