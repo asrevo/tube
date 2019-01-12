@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,11 +43,10 @@ public class MasterController {
 
 
     @GetMapping("who")
-    public Object ss() {
+    public Mono<User> ss() {
         return ReactiveSecurityContextHolder.getContext().map(it -> it.getAuthentication().getPrincipal()).cast(Jwt.class).map(Jwt::getClaims)
-                .map(it -> mapper.convertValue(it, User.class))
-                ;
-//        return jwt;
+                .map(it -> it.get("user"))
+                .map(it -> mapper.convertValue(it, User.class));
     }
 
     @GetMapping("{size}/{id}")
