@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .jwt()
                 .jwtAuthenticationConverter(new ReactiveJwtAuthenticationConverterAdapter(new JwtAuthenticationConverter() {
                     protected Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
-                        return createAuthorityList(((String[]) jwt.getClaims().get("authorities")));
+                        return createAuthorityList(((String) jwt.getClaims().get("authorities")).split(" "));
                     }
                 }))
                 .and().and().build();
