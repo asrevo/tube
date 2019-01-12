@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -38,13 +40,14 @@ public class MasterController {
     private final String indexUrl = masterURL + "/{index}.m3u8";
     private final String keyUrl = masterURL + "/{master_id}.key";
 
-
-    final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
+    @Autowired
+    private ObjectMapper mapper;
 
 
     @GetMapping("who")
     public Mono<User> ss() {
-        return ReactiveSecurityContextHolder.getContext().map(it -> it.getAuthentication().getPrincipal()).cast(Jwt.class).map(Jwt::getClaims)
+        return ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getPrincipal)
+                .cast(Jwt.class).map(Jwt::getClaims)
                 .map(it -> it.get("user"))
                 .map(it -> mapper.convertValue(it, User.class));
     }
