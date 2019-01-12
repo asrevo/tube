@@ -1,10 +1,12 @@
 package org.revo.Controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.revo.Domain.Ids;
 import org.revo.Domain.Master;
 import org.revo.Domain.Status;
+import org.revo.Domain.User;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
 import org.revo.Service.UserService;
@@ -12,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +37,15 @@ public class MasterController {
     private final String indexUrl = masterURL + "/{index}.m3u8";
     private final String keyUrl = masterURL + "/{master_id}.key";
 
+
+    final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
+
+
     @GetMapping("who")
     public Object ss() {
-        return ReactiveSecurityContextHolder.getContext().map(it -> it.getAuthentication().getPrincipal());
+        return ReactiveSecurityContextHolder.getContext().map(it -> it.getAuthentication().getPrincipal()).cast(Jwt.class).map(Jwt::getClaims)
+                .map(it -> mapper.convertValue(it, User.class))
+                ;
 //        return jwt;
     }
 
