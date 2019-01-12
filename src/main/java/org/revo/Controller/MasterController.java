@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -34,9 +35,11 @@ public class MasterController {
     private final String keyUrl = masterURL + "/{master_id}.key";
 
     @GetMapping("who")
-    public Authentication ss(@AuthenticationPrincipal Jwt jwt) {
+    public Object ss(@AuthenticationPrincipal Jwt jwt) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication;
+        JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
+        return token.getPrincipal();
+//        return jwt;
     }
 
     @GetMapping("{size}/{id}")
