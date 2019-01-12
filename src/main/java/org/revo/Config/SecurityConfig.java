@@ -1,5 +1,6 @@
 package org.revo.Config;
 
+import net.minidev.json.JSONArray;
 import org.revo.Service.UserService;
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +37,7 @@ public class SecurityConfig {
                 .jwt()
                 .jwtAuthenticationConverter(new ReactiveJwtAuthenticationConverterAdapter(new JwtAuthenticationConverter() {
                     protected Collection<GrantedAuthority> extractAuthorities(Jwt jwt) {
-                        return createAuthorityList(((String) jwt.getClaims().get("authorities")).split(" "));
+                        return createAuthorityList(((JSONArray) jwt.getClaims().get("authorities")).stream().toArray(String[]::new));
                     }
                 }))
                 .and().and().build();
