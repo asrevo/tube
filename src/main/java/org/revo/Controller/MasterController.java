@@ -5,14 +5,14 @@ import org.apache.commons.io.IOUtils;
 import org.revo.Domain.Ids;
 import org.revo.Domain.Master;
 import org.revo.Domain.Status;
-import org.revo.Domain.User;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
+import org.revo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -27,13 +27,16 @@ public class MasterController {
     private MasterService masterService;
     @Autowired
     private IndexService indexService;
+
+    @Autowired
+    private UserService userService;
     private final String masterURL = "{master}.m3u8";
     private final String indexUrl = masterURL + "/{index}.m3u8";
     private final String keyUrl = masterURL + "/{master_id}.key";
 
     @GetMapping("who")
-    public Object ss(@AuthenticationPrincipal User user) {
-        return user;
+    public Jwt ss() {
+        return userService.cur(null);
     }
 
     @GetMapping("{size}/{id}")

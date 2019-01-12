@@ -1,6 +1,9 @@
 package org.revo.Service.Impl;
 
+import org.revo.Domain.User;
 import org.revo.Service.UserService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,5 +32,11 @@ public class UserServiceImpl implements UserService {
         }
 */
         return Optional.of("-1");
+    }
+
+    @Override
+    public Jwt cur(@AuthenticationPrincipal Jwt user) {
+
+        return user;
     }
 }
