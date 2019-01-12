@@ -37,8 +37,8 @@ public class MasterController {
     @GetMapping("who")
     public Object ss(@AuthenticationPrincipal Jwt jwt) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
-        return token.getPrincipal();
+        Jwt principal = (Jwt) authentication.getPrincipal();
+        return principal;
 //        return jwt;
     }
 
