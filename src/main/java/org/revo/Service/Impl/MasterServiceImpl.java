@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class MasterServiceImpl implements MasterService {
     private IndexService indexService;
 
     @Override
-    public Master saveInfo(Master master) {
+    public Mono<Master> saveInfo(Master master) {
         return masterRepository.findById(master.getId()).map(it -> {
             it.setTime(master.getTime());
             it.setResolution(master.getResolution());
@@ -42,18 +43,18 @@ public class MasterServiceImpl implements MasterService {
             it.setImpls(master.getImpls());
             it.setSplits(master.getSplits());
             return it;
-        }).map(it -> masterRepository.save(it)).orElse(null);
+        }).flatMap(it -> masterRepository.save(it));
     }
 
     @Override
-    public void append(Index index) {
-        findOne(index.getMaster())
-                .map(it -> {
-                    List<IndexImpl> indexList = it.getImpls().stream().filter(i -> i.getIndex() != null && !i.getIndex().equals(index.getId())).collect(toList());
-                    indexList.add(new IndexImpl(index.getId(), index.getResolution(), Status.SUCCESS, index.getExecution()));
+    public Mono<Master> append(Mono<Index> index) {
+        return index.flatMap(itv -> findOne(itv.getMaster())
+                .flatMap(it -> {
+                    List<IndexImpl> indexList = it.getImpls().stream().filter(i -> i.getIndex() != null && !i.getIndex().equals(itv.getId())).collect(toList());
+                    indexList.add(new IndexImpl(itv.getId(), itv.getResolution(), Status.SUCCESS, itv.getExecution()));
                     it.setImpls(indexList);
                     return masterRepository.save(it);
-                });
+                }));
     }
 
     private static String getParsedTag(Index index) {
@@ -73,13 +74,13 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
-    public Master save(Master master) {
+    public Mono<Master> save(Master master) {
         master.setSecret(generateKey());
         return masterRepository.save(master);
     }
 
     @Override
-    public Optional<Master> findOne(String master) {
+    public Mono<Master> findOne(String master) {
         return masterRepository.findById(master);
     }
 

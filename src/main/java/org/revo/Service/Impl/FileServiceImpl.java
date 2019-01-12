@@ -5,6 +5,7 @@ import org.revo.Repository.FileRepository;
 import org.revo.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -12,7 +13,7 @@ public class FileServiceImpl implements FileService {
     private FileRepository fileRepository;
 
     @Override
-    public File save(File file) {
+    public Mono<File> save(File file) {
         return fileRepository.save(file);
     }
 }

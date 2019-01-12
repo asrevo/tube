@@ -1,12 +1,10 @@
 package org.revo.Controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.revo.Domain.Ids;
 import org.revo.Domain.Master;
 import org.revo.Domain.Status;
-import org.revo.Domain.User;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
 import org.revo.Service.UserService;
@@ -14,16 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("api")
@@ -40,17 +33,6 @@ public class MasterController {
     private final String indexUrl = masterURL + "/{index}.m3u8";
     private final String keyUrl = masterURL + "/{master_id}.key";
 
-    @Autowired
-    private ObjectMapper mapper;
-
-
-    @GetMapping("who")
-    public Mono<User> ss() {
-        return ReactiveSecurityContextHolder.getContext().map(SecurityContext::getAuthentication).map(Authentication::getPrincipal)
-                .cast(Jwt.class).map(Jwt::getClaims)
-                .map(it -> it.get("user"))
-                .map(it -> mapper.convertValue(it, User.class));
-    }
 
     @GetMapping("{size}/{id}")
     public Iterable<Master> findAllPagining(@PathVariable int size, @PathVariable String id) {
@@ -77,7 +59,7 @@ public class MasterController {
     }
 
     @GetMapping("one/{id}")
-    public Optional<Master> findOne(@PathVariable("id") String id) {
+    public Mono<Master> findOne(@PathVariable("id") String id) {
         return masterService.findOne(id);
     }
 
@@ -90,18 +72,18 @@ public class MasterController {
     }
 
     @GetMapping(indexUrl)
-    public ResponseEntity<InputStreamResource> findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index) {
+    public ResponseEntity<Mono<InputStreamResource>> findOneIndex(@PathVariable("master") String master, @PathVariable("index") String index) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
-                .body(new InputStreamResource(IOUtils.toInputStream(indexService.findOneParsed(master, index))));
+                .body(indexService.findOneParsed(master, index).map(IOUtils::toInputStream).map(InputStreamResource::new));
     }
 
     @GetMapping(keyUrl)
-    public ResponseEntity<InputStreamResource> findOneKey(@PathVariable("master") String master) {
+    public ResponseEntity<Mono<InputStreamResource>> findOneKey(@PathVariable("master") String master) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/pgp-keys")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
-                .body(new InputStreamResource(IOUtils.toInputStream(masterService.findOne(master).map(Master::getSecret).orElse(""))));
+                .body(masterService.findOne(master).map(Master::getSecret).map(IOUtils::toInputStream).map(InputStreamResource::new));
     }
 }

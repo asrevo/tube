@@ -30,6 +30,6 @@ public class SecurityConfig {
 
     @Bean
     public AuditorAware<String> aware(UserService userService) {
-        return userService::current;
+        return () -> userService.current().blockOptional();
     }
 }

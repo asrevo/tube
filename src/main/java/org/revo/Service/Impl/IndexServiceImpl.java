@@ -7,9 +7,9 @@ import org.revo.Service.IndexService;
 import org.revo.Service.SignedUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.nio.file.Paths.get;
 import static org.revo.Util.Util.TOString;
@@ -24,12 +24,12 @@ public class IndexServiceImpl implements IndexService {
     private Env env;
 
     @Override
-    public Index save(Index index) {
+    public Mono<Index> save(Index index) {
         return indexRepository.save(index);
     }
 
     @Override
-    public Optional<Index> findOne(String id) {
+    public Mono<Index> findOne(String id) {
         return indexRepository.findById(id);
     }
 
@@ -39,8 +39,8 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public String findOneParsed(String master, String index) {
-        return findOne(index).map(it -> TOString(it.getTags(), s -> signedUrlService.generate(env.getBuckets().get("ts"), get("hls", master, index, s).toString()))).orElse("");
+    public Mono<String> findOneParsed(String master, String index) {
+        return findOne(index).map(it -> TOString(it.getTags(), s -> signedUrlService.generate(env.getBuckets().get("ts"), get("hls", master, index, s).toString())));
     }
 
 }

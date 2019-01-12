@@ -4,18 +4,18 @@ import org.revo.Domain.Ids;
 import org.revo.Domain.Index;
 import org.revo.Domain.Master;
 import org.revo.Domain.Status;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface MasterService {
-    Master saveInfo(Master master);
+    Mono<Master> saveInfo(Master master);
 
-    void append(Index index);
+    Mono<Master> append(Mono<Index> index);
 
-    Master save(Master master);
+    Mono<Master> save(Master master);
 
-    Optional<Master> findOne(String master);
+    Mono<Master> findOne(String master);
 
     String getStream(String master);
 

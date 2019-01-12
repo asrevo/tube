@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 //import javax.servlet.http.HttpServletRequest;
 
@@ -30,11 +31,14 @@ public class FileController {
     @PostMapping("save")
     public void save(@RequestBody File file, ServerHttpRequest request) {
 //        file.setIp(request.getHeaders().get("X-FORWARDED-FOR"));
-        Message<File> fileMessage = MessageBuilder.withPayload(fileService.save(file)).build();
+        Message<Mono<File>> fileMessage = MessageBuilder.withPayload(fileService.save(file)).build();
         template.convertAndSend("lambda_file_queue", fileMessage);
+/*
         if (fileMessage.getPayload().getUrl().startsWith("http")) {
             log.info("send file_queue " + fileMessage.getPayload().getId());
+*/
             processor.file_queue().send(fileMessage);
+/*
 
         } else if (fileMessage.getPayload().getUrl().startsWith("magnet")) {
             log.info("send torrent_queue " + fileMessage.getPayload().getId());
@@ -42,5 +46,6 @@ public class FileController {
         } else {
             log.info("send to unknown");
         }
+*/
     }
 }
