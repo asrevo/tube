@@ -11,14 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-//import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("api")
@@ -31,6 +30,11 @@ public class MasterController {
     private final String masterURL = "{master}.m3u8";
     private final String indexUrl = masterURL + "/{index}.m3u8";
     private final String keyUrl = masterURL + "/{master_id}.key";
+
+    @GetMapping("who")
+    public Jwt ss(@AuthenticationPrincipal Jwt jwt) {
+        return jwt;
+    }
 
     @GetMapping("{size}/{id}")
     public Iterable<Master> findAllPagining(@PathVariable int size, @PathVariable String id) {
