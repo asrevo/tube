@@ -1,6 +1,7 @@
 package org.revo.Service;
 
 import org.revo.Domain.Index;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -12,5 +13,5 @@ public interface IndexService {
 
     Mono<Index> findOne(String id);
 
-    List<Index> findByMaster(String master);
+    Flux<Index> findByMaster(String master);
 }

@@ -12,10 +12,10 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.List;
 
 @RestController
 @RequestMapping("api")
@@ -32,24 +32,24 @@ public class MasterController {
 
 
     @GetMapping("{size}/{id}")
-    public Iterable<Master> findAllPagining(@PathVariable int size, @PathVariable String id) {
+    public Flux<Master> findAllPagining(@PathVariable int size, @PathVariable String id) {
         if (id.equals("0")) id = null;
         return masterService.findAll(Status.SUCCESS, size, id, new Ids(), new Ids());
     }
 
     @PostMapping("{size}/{id}")
-    public Iterable<Master> findAllPaginingWithnUsers(@PathVariable int size, @PathVariable String id, @RequestBody Ids ids) {
+    public Flux<Master> findAllPaginingWithnUsers(@PathVariable int size, @PathVariable String id, @RequestBody Ids ids) {
         if (id.equals("0")) id = null;
         return masterService.findAll(Status.SUCCESS, size, id, ids, new Ids());
     }
 
     @PostMapping
-    public Iterable<Master> findAllByIds(@RequestBody Ids ids) {
+    public Flux<Master> findAllByIds(@RequestBody Ids ids) {
         return masterService.findAll(Status.SUCCESS, 1000, null, new Ids(), ids);
     }
 
     @GetMapping("user/{id}")
-    public List<Master> findAllByUser(@PathVariable("id") String id) {
+    public Flux<Master> findAllByUser(@PathVariable("id") String id) {
         Ids ids = new Ids();
         ids.setIds(Arrays.asList(id));
         return masterService.findAll(Status.SUCCESS, 1000, null, ids, new Ids());
@@ -61,11 +61,11 @@ public class MasterController {
     }
 
     @GetMapping(masterURL)
-    public ResponseEntity<InputStreamResource> findOneMaster(@PathVariable("master") String master) {
+    public ResponseEntity<Mono<InputStreamResource>> findOneMaster(@PathVariable("master") String master) {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/x-mpegURL")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
-                .body(new InputStreamResource(IOUtils.toInputStream(masterService.getStream(master))));
+                .body(masterService.getStream(master).map(IOUtils::toInputStream).map(InputStreamResource::new));
     }
 
     @GetMapping(indexUrl)

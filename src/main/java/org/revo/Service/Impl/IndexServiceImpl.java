@@ -7,6 +7,7 @@ import org.revo.Service.IndexService;
 import org.revo.Service.SignedUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     @Override
-    public List<Index> findByMaster(String master) {
+    public Flux<Index> findByMaster(String master) {
         return indexRepository.findByMaster(master);
     }
 

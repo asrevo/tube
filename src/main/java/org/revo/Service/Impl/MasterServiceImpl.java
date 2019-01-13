@@ -7,10 +7,11 @@ import org.revo.Repository.MasterRepository;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.file.Paths;
@@ -30,7 +31,7 @@ public class MasterServiceImpl implements MasterService {
     @Autowired
     private MasterRepository masterRepository;
     @Autowired
-    private MongoOperations mongoOperations;
+    private ReactiveMongoOperations reactiveMongoOperations;
     @Autowired
     private IndexService indexService;
 
@@ -85,12 +86,12 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
-    public String getStream(String master) {
-        return "#EXTM3U\n#EXT-X-VERSION:4\n# Media Playlists\n" + indexService.findByMaster(master).stream().map(MasterServiceImpl::getParsedTag).collect(Collectors.joining());
+    public Mono<String> getStream(String master) {
+        return indexService.findByMaster(master).map(MasterServiceImpl::getParsedTag).reduce("#EXTM3U\n#EXT-X-VERSION:4\n# Media Playlists\n", (x1, x2) -> x1 + x2);
     }
 
     @Override
-    public List<Master> findAll(Status status, int size, String id, Ids userIds, Ids masterIds) {
+    public Flux<Master> findAll(Status status, int size, String id, Ids userIds, Ids masterIds) {
         Criteria lt = where("impls.status").is(status.toString());
         if (masterIds.getIds().size() == 0)
             lt.and("id").lt(Optional.ofNullable(id).map(ObjectId::new).orElse(new ObjectId()));
@@ -114,6 +115,6 @@ public class MasterServiceImpl implements MasterService {
                 , sort(DESC, "id")
                 , limit(size));
 
-        return mongoOperations.aggregate(agg, Master.class).getMappedResults();
+        return reactiveMongoOperations.aggregate(agg, Master.class);
     }
 }
