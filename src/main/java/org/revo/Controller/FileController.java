@@ -25,9 +25,10 @@ public class FileController {
     @PostMapping("save")
     public Mono<Void> save(@RequestBody File file) {
         return fileService.save(file)
-                .publishOn(Schedulers.elastic())
-                .map(MessageBuilder::withPayload)
-                .map(MessageBuilder::build)
-                .doOnNext(it -> processor.file_queue().send(it)).then();
+//                .publishOn(Schedulers.elastic())
+//                .map(MessageBuilder::withPayload)
+//                .map(MessageBuilder::build)
+//                .doOnNext(it -> processor.file_queue().send(it))
+                .then();
     }
 }
