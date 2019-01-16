@@ -45,11 +45,19 @@ public class MainController {
 
     @Bean
     public RouterFunction<ServerResponse> function() {
-        return nest(path("/api/file"), route(POST("/save"), serverRequest -> ok().body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it))
-                        .doOnNext(it -> {
-                            processor.file_queue().send(MessageBuilder.withPayload(it).build());
-                        }).then()
-                , Void.class)))
+        return nest(path("/api/file"), route(POST("/save"), serverRequest -> {
+
+            return ok().body(serverRequest.bodyToMono(File.class)
+                            .map(it -> {
+                                it.setIp(serverRequest.exchange().getRequest().getHeaders().get("X-FORWARDED-FOR").get(0));
+                                return it;
+                            })
+                            .flatMap(it -> fileService.save(it))
+                            .doOnNext(it -> {
+                                processor.file_queue().send(MessageBuilder.withPayload(it).build());
+                            }).then()
+                    , Void.class);
+        }))
                 .andNest(path("/api/master"),
                         route(GET("/{size}/{id}"), serverRequest -> {
                             Integer size = Integer.valueOf(serverRequest.pathVariable("size"));
