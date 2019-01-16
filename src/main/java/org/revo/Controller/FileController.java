@@ -32,7 +32,10 @@ public class FileController {
     @Bean
     public RouterFunction<ServerResponse> function() {
         return route()
-                .POST("api/file/save", serverRequest -> ok().contentType(MediaType.APPLICATION_JSON).body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it)), File.class))
+                .POST("api/file/save", serverRequest -> {
+                    Mono<Void> p = serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it)).then();
+                    return ok().build(p);
+                })
                 .build();
     }
 
