@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequestMapping("api/file")
@@ -23,7 +24,9 @@ public class FileController {
 
     @PostMapping("save")
     public Mono<Void> save(@RequestBody File file) {
-        return fileService.save(file).map(MessageBuilder::withPayload)
+        return fileService.save(file)
+                .publishOn(Schedulers.elastic())
+                .map(MessageBuilder::withPayload)
                 .map(MessageBuilder::build)
                 .doOnNext(it -> processor.file_queue().send(it)).then();
     }
