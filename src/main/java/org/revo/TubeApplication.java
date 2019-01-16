@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableMongoAuditing
+//@EnableMongoAuditing
 @EnableBinding({Processor.class})
 @EnableConfigurationProperties(Env.class)
 public class TubeApplication {

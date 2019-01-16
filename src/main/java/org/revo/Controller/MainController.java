@@ -32,7 +32,7 @@ public class MainController {
     @Bean
     public RouterFunction<ServerResponse> function() {
         return nest(path("/api/file"), route(POST("/save"), serverRequest -> {
-            return ok().body(serverRequest.bodyToMono(File.class)/*.flatMap(it -> fileService.save(it))*/, File.class)
+            return ok().body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it)), File.class)
                     ;
         }))
 /*
