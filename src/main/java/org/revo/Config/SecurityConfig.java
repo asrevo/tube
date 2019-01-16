@@ -1,10 +1,8 @@
 package org.revo.Config;
 
 import net.minidev.json.JSONArray;
-import org.revo.Service.UserService;
 import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -43,8 +41,4 @@ public class SecurityConfig {
                 .and().and().build();
     }
 
-    @Bean
-    public AuditorAware<String> aware(UserService userService) {
-        return () -> userService.current().blockOptional();
-    }
 }

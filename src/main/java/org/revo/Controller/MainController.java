@@ -1,24 +1,31 @@
 package org.revo.Controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.revo.Config.Processor;
 import org.revo.Domain.File;
+import org.revo.Domain.Ids;
+import org.revo.Domain.Master;
+import org.revo.Domain.Status;
 import org.revo.Service.FileService;
+import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
-import static org.springframework.web.reactive.function.server.RequestPredicates.path;
+import java.util.Arrays;
+
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.nest;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
-//@RestController
-//@RequestMapping("api/file")
 @Slf4j
 @Configuration
 public class MainController {
@@ -28,14 +35,21 @@ public class MainController {
     public Processor processor;
     @Autowired
     private MasterService masterService;
+    @Autowired
+    private IndexService indexService;
+
+    private final String masterURL = "/{master}.m3u8";
+    private final String indexUrl = masterURL + "/{index}.m3u8";
+    private final String keyUrl = masterURL + "/{master_id}.key";
+
 
     @Bean
     public RouterFunction<ServerResponse> function() {
-        return nest(path("/api/file"), route(POST("/save"), serverRequest -> {
-            return ok().body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it)), File.class)
-                    ;
-        }))
-/*
+        return nest(path("/api/file"), route(POST("/save"), serverRequest -> ok().body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it))
+                        .doOnNext(it -> {
+                            processor.file_queue().send(MessageBuilder.withPayload(it).build());
+                        }).then()
+                , Void.class)))
                 .andNest(path("/api/master"),
                         route(GET("/{size}/{id}"), serverRequest -> {
                             Integer size = Integer.valueOf(serverRequest.pathVariable("size"));
@@ -61,8 +75,29 @@ public class MainController {
                                     String id = serverRequest.pathVariable("id");
                                     return ok().body(masterService.findOne(id), Master.class);
                                 })
+                                .andRoute(GET(masterURL), serverRequest -> {
+                                    String master = serverRequest.pathVariable("master");
+                                    return ok()
+                                            .header("Content-Type", "application/x-mpegURL")
+                                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
+                                            .body(masterService.getStream(master).map(IOUtils::toInputStream).map(InputStreamResource::new), InputStreamResource.class);
+                                })
+                                .andRoute(GET(indexUrl), serverRequest -> {
+                                    String master = serverRequest.pathVariable("master");
+                                    String index = serverRequest.pathVariable("index");
+                                    return ok()
+                                            .header("Content-Type", "application/x-mpegURL")
+                                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".m3u8")
+                                            .body(indexService.findOneParsed(master, index).map(IOUtils::toInputStream).map(InputStreamResource::new), InputStreamResource.class);
+                                })
+                                .andRoute(GET(keyUrl), serverRequest -> {
+                                    String master = serverRequest.pathVariable("master");
+                                    return ok()
+                                            .header("Content-Type", "application/pgp-keys")
+                                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
+                                            .body(masterService.findOne(master).map(Master::getSecret).map(IOUtils::toInputStream).map(InputStreamResource::new), InputStreamResource.class);
+                                })
                 )
-*/
                 ;
     }
 

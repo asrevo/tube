@@ -6,6 +6,7 @@ import org.revo.Domain.*;
 import org.revo.Repository.MasterRepository;
 import org.revo.Service.IndexService;
 import org.revo.Service.MasterService;
+import org.revo.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -34,6 +35,8 @@ public class MasterServiceImpl implements MasterService {
     private ReactiveMongoOperations reactiveMongoOperations;
     @Autowired
     private IndexService indexService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public Mono<Master> saveInfo(Master master) {
@@ -76,8 +79,12 @@ public class MasterServiceImpl implements MasterService {
 
     @Override
     public Mono<Master> save(Master master) {
-        master.setSecret(generateKey());
-        return masterRepository.save(master);
+        return userService.current().flatMap(it -> {
+            master.setSecret(generateKey());
+            master.setUserId(it);
+            return masterRepository.save(master);
+
+        });
     }
 
     @Override
