@@ -5,30 +5,34 @@ import org.revo.Config.Processor;
 import org.revo.Domain.File;
 import org.revo.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.support.MessageBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-@RestController
-@RequestMapping("api/file")
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+import static org.springframework.web.reactive.function.server.ServerResponse.ok;
+
+//@RestController
+//@RequestMapping("api/file")
 @Slf4j
+@Configuration
 public class FileController {
     @Autowired
     public FileService fileService;
     @Autowired
     public Processor processor;
 
-    @PostMapping("save")
-    public Mono<Void> save(@RequestBody File file) {
-        return fileService.save(file)
-//                .publishOn(Schedulers.elastic())
-//                .map(MessageBuilder::withPayload)
-//                .map(MessageBuilder::build)
-//                .doOnNext(it -> processor.file_queue().send(it))
-                .then();
+    @Bean
+    public RouterFunction<ServerResponse> function() {
+        return route()
+                .POST("api/file/save", serverRequest -> ok().body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it)).then(), Void.class))
+                .build();
     }
+
 }
