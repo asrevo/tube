@@ -21,6 +21,7 @@ import java.util.Arrays;
 @RequestMapping("api")
 @Slf4j
 public class MasterController {
+/*
     @Autowired
     private MasterService masterService;
     @Autowired
@@ -83,4 +84,5 @@ public class MasterController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
                 .body(masterService.findOne(master).map(Master::getSecret).map(IOUtils::toInputStream).map(InputStreamResource::new));
     }
+*/
 }
