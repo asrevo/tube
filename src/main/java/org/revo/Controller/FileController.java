@@ -7,6 +7,7 @@ import org.revo.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +32,7 @@ public class FileController {
     @Bean
     public RouterFunction<ServerResponse> function() {
         return route()
-                .POST("api/file/save", serverRequest -> ok().body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it)).then(), Void.class))
+                .POST("api/file/save", serverRequest -> ok().contentType(MediaType.APPLICATION_JSON).body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it)).then(), Void.class))
                 .build();
     }
 
