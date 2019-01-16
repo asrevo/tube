@@ -7,14 +7,11 @@ import org.revo.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.web.reactive.function.server.RequestPredicates.*;
-import static org.springframework.web.reactive.function.server.RouterFunctions.nest;
+import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
@@ -37,10 +34,15 @@ public class FileController {
 //                                .andRoute(method(HttpMethod.GET), handler::allPeople).andRoute(POST("/").and(contentType(APPLICATION_JSON)), handler::savePerson))
 //                );
 //
+
+
+        //        return nest(path(""),route(GET(""),it->null)).andNest(path(""),route(GET(""),it->null));
+
+
         return route(
                 POST("/api/file/save"), serverRequest -> ok().body(serverRequest.bodyToMono(File.class).flatMap(it -> fileService.save(it))
-                .doOnNext(it -> processor.file_queue().send(MessageBuilder.withPayload(it).build()))
-                .then(), Void.class)
+//                        .doOnNext(it -> processor.file_queue().send(MessageBuilder.withPayload(it).build()))
+                        .then(), Void.class)
 
         );
     }
