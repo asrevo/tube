@@ -59,26 +59,12 @@ public class MainController {
                     , Void.class);
         }))
                 .andNest(path("/api/master"),
-                        route(GET("/{size}/{id}"), serverRequest -> {
-                            Integer size = Integer.valueOf(serverRequest.pathVariable("size"));
+                        route(GET("/user/{id}"), serverRequest -> {
                             String id = serverRequest.pathVariable("id");
-                            if (id.equals("0")) id = null;
-                            return ok().body(masterService.findAll(Status.SUCCESS, size, id, new Ids(), new Ids()), Master.class);
+                            Ids ids = new Ids();
+                            ids.setIds(Arrays.asList(id));
+                            return ok().body(masterService.findAll(Status.SUCCESS, 1000, null, ids, new Ids()), Master.class);
                         })
-                                .andRoute(POST("/{size}/{id}"), serverRequest -> ok().body(serverRequest.bodyToMono(Ids.class).flatMapMany(it -> {
-                                    Integer size = Integer.valueOf(serverRequest.pathVariable("size"));
-                                    String id = serverRequest.pathVariable("id");
-                                    return masterService.findAll(Status.SUCCESS, size, id, it, new Ids());
-                                }), Master.class))
-                                .andRoute(POST("/"), serverRequest -> ok().body(serverRequest.bodyToMono(Ids.class).flatMapMany(it -> {
-                                    return masterService.findAll(Status.SUCCESS, 1000, null, new Ids(), it);
-                                }), Master.class))
-                                .andRoute(GET("/user/{id}"), serverRequest -> {
-                                    String id = serverRequest.pathVariable("id");
-                                    Ids ids = new Ids();
-                                    ids.setIds(Arrays.asList(id));
-                                    return ok().body(masterService.findAll(Status.SUCCESS, 1000, null, ids, new Ids()), Master.class);
-                                })
                                 .andRoute(GET("/one/{id}"), serverRequest -> {
                                     String id = serverRequest.pathVariable("id");
                                     return ok().body(masterService.findOne(id), Master.class);
@@ -105,6 +91,21 @@ public class MainController {
                                             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + master + ".key")
                                             .body(masterService.findOne(master).map(Master::getSecret).map(IOUtils::toInputStream).map(InputStreamResource::new), InputStreamResource.class);
                                 })
+                                .andRoute(GET("/{size}/{id}"), serverRequest -> {
+                                    Integer size = Integer.valueOf(serverRequest.pathVariable("size"));
+                                    String id = serverRequest.pathVariable("id");
+                                    if (id.equals("0")) id = null;
+                                    return ok().body(masterService.findAll(Status.SUCCESS, size, id, new Ids(), new Ids()), Master.class);
+                                })
+                                .andRoute(POST("/{size}/{id}"), serverRequest -> ok().body(serverRequest.bodyToMono(Ids.class).flatMapMany(it -> {
+                                    Integer size = Integer.valueOf(serverRequest.pathVariable("size"));
+                                    String id = serverRequest.pathVariable("id");
+                                    return masterService.findAll(Status.SUCCESS, size, id, it, new Ids());
+                                }), Master.class))
+                                .andRoute(POST("/"), serverRequest -> ok().body(serverRequest.bodyToMono(Ids.class).flatMapMany(it -> {
+                                    return masterService.findAll(Status.SUCCESS, 1000, null, new Ids(), it);
+                                }), Master.class))
+
                 )
                 ;
     }
