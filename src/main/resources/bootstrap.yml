@@ -27,6 +27,3 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://revo:revo@${org.revo.env.eureka.externalurl:${org.revo.env.eureka.internalurl}}/eureka/
-logging:
-  level:
-    org.springframework: debug
