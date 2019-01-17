@@ -79,12 +79,8 @@ public class MasterServiceImpl implements MasterService {
 
     @Override
     public Mono<Master> save(Master master) {
-        return userService.current().flatMap(it -> {
-            master.setSecret(generateKey());
-            master.setUserId(it);
-            return masterRepository.save(master);
-
-        });
+        master.setSecret(generateKey());
+        return masterRepository.save(master);
     }
 
     @Override
