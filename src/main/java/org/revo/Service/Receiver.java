@@ -5,10 +5,10 @@ import org.revo.Config.Processor;
 import org.revo.Domain.Index;
 import org.revo.Domain.Master;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.SendTo;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +31,7 @@ public class Receiver {
     }
 
     @StreamListener(value = Processor.tube_info)
-    @SendTo(value = Processor.feedback_index)
+    @Output(value = Processor.feedback_index)
     public Flux<Master> info(Message<Master> master) {
         log.info("receive tube_info ");
         return masterService.saveInfo(master.getPayload())
@@ -39,7 +39,7 @@ public class Receiver {
     }
 
     @StreamListener(value = Processor.tube_store)
-    @SendTo(value = Processor.ffmpeg_queue)
+    @Output(value = Processor.ffmpeg_queue)
     public Flux<Master> store(Message<Master> master) {
         log.info("receive tube_store ");
         Flux<Master> save = masterService.save(master.getPayload()).flatMapMany(Mono::just);
