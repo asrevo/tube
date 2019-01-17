@@ -25,24 +25,28 @@ public class Receiver {
 
     @StreamListener
     public void hls(@Input(Processor.tube_hls) Flux<Index> index) {
-        log.info("receive tube_hls ");
-        index.flatMap(it -> indexService.save(it)).
-                flatMap(it -> masterService.append(Mono.just(it))).subscribe();
+        index
+                .doOnNext(it -> log.info("receive tube_hls " + it.getId()))
+                .flatMap(it -> indexService.save(it))
+                .flatMap(it -> masterService.append(Mono.just(it)))
+                .subscribe();
     }
 
     @StreamListener
     @Output(Processor.feedback_index)
     public Flux<Master> info(@Input(Processor.tube_info) Flux<Master> master) {
-        log.info("receive tube_info ");
-        return master.flatMap(it -> masterService.saveInfo(it));
+        return master
+                .doOnNext(it -> log.info("receive tube_info " + it.getId()))
+                .flatMap(it -> masterService.saveInfo(it))
+                .doOnNext(it -> log.info("send feedback_index " + it.getId()));
     }
 
     @StreamListener
     @Output(Processor.ffmpeg_queue)
     public Flux<Master> store(@Input(Processor.tube_store) Flux<Master> master) {
-        log.info("receive tube_store ");
-        Flux<Master> save = master.flatMap(it -> masterService.save(it));
-        log.info("send ffmpeg_queue ");
-        return save;
+        return master
+                .doOnNext(it -> log.info("receive tube_store " + it.getId()))
+                .flatMap(it -> masterService.save(it))
+                .doOnNext(it -> log.info("send ffmpeg_queue " + it.getId()));
     }
 }
